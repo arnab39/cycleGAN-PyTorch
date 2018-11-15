@@ -1,4 +1,4 @@
-#CycleGAN using PyTorch
+# CycleGAN using PyTorch
 CycleGAN is one of the most interesting work I have read. Although, the idea behind cycleGAN looks quite intuitive after you read the paper: [Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks](https://arxiv.org/abs/1703.10593), I found the official PyTorch implementation of cycleGAN a bit difficult to understand. I had to implemented cycleGAN to use it for some other work. So, I thought of making my clean and lucid implementation of cycleGAN using PyTorch public for others. 
 
 ## Requirements
