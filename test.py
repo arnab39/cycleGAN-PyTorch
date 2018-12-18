@@ -1,4 +1,3 @@
-import model
 import os
 import torch
 from torch import nn
@@ -7,6 +6,7 @@ import torchvision
 import torchvision.datasets as dsets
 import torchvision.transforms as transforms
 import utils
+from arch import define_Gen, define_Dis
 
 
 
@@ -25,11 +25,13 @@ def test(args):
     b_test_data = dsets.ImageFolder(dataset_dirs['testB'], transform=transform)
 
 
-    a_test_loader = torch.utils.data.DataLoader(a_test_data, batch_size=args.batch_size, shuffle=False, num_workers=4)
-    b_test_loader = torch.utils.data.DataLoader(b_test_data, batch_size=args.batch_size, shuffle=False, num_workers=4)
+    a_test_loader = torch.utils.data.DataLoader(a_test_data, batch_size=args.batch_size, shuffle=True, num_workers=4)
+    b_test_loader = torch.utils.data.DataLoader(b_test_data, batch_size=args.batch_size, shuffle=True, num_workers=4)
 
-    Gab = model.Generator()
-    Gba = model.Generator()
+    self.Gab = define_Gen(input_nc=3, output_nc=3, ngf=args.ngf, netG='resnet_9blocks', norm=args.norm, 
+                                                    use_dropout= not args.no_dropout, gpu_ids=args.gpu_ids)
+    self.Gba = define_Gen(input_nc=3, output_nc=3, ngf=args.ngf, netG='resnet_9blocks', norm=args.norm, 
+                                                    use_dropout= not args.no_dropout, gpu_ids=args.gpu_ids)
 
     utils.cuda([Gab, Gba])
 

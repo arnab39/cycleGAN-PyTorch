@@ -8,48 +8,7 @@ from torch.autograd import Variable
 import torchvision.datasets as dsets
 import torchvision.transforms as transforms
 import utils
-from ops import conv_bn_lrelu, conv_bn_relu, dconv_bn_relu, ResidualBlock
-
-
-class Discriminator(nn.Module):
-    def __init__(self, dim=64):
-        super(Discriminator, self).__init__()
-        self.dis = nn.Sequential(nn.Conv2d(3, dim, 4, 2, 1), nn.LeakyReLU(0.2),
-                                conv_bn_lrelu(dim * 1, dim * 2, 4, 2, 1),
-                                conv_bn_lrelu(dim * 2, dim * 4, 4, 2, 1),
-                                conv_bn_lrelu(dim * 4, dim * 8, 4, 1, (1, 2)),
-                                nn.Conv2d(dim * 8, 1, 4, 1, (2, 1)))
-
-    def forward(self, x):
-        return self.dis(x)
-
-
-
-class Generator(nn.Module):
-    def __init__(self, dim=64):
-        super(Generator, self).__init__()
-        self.gen = nn.Sequential(nn.ReflectionPad2d(3),
-                                conv_bn_relu(3, dim * 1, 7, 1),
-                                conv_bn_relu(dim * 1, dim * 2, 3, 2, 1),
-                                conv_bn_relu(dim * 2, dim * 4, 3, 2, 1),
-                                ResidualBlock(dim * 4, dim * 4),
-                                ResidualBlock(dim * 4, dim * 4),
-                                ResidualBlock(dim * 4, dim * 4),
-                                ResidualBlock(dim * 4, dim * 4),
-                                ResidualBlock(dim * 4, dim * 4),
-                                ResidualBlock(dim * 4, dim * 4),
-                                ResidualBlock(dim * 4, dim * 4),
-                                ResidualBlock(dim * 4, dim * 4),
-                                ResidualBlock(dim * 4, dim * 4),
-                                dconv_bn_relu(dim * 4, dim * 2, 3, 2, 1, 1),
-                                dconv_bn_relu(dim * 2, dim * 1, 3, 2, 1, 1),
-                                nn.ReflectionPad2d(3),
-                                nn.Conv2d(dim, 3, 7, 1),
-                                nn.Tanh())
-
-    def forward(self, x):
-        return self.gen(x)
-
+from arch import define_Gen, define_Dis
 
 
 '''
@@ -59,13 +18,17 @@ Class for CycleGAN with train() as a member function
 class cycleGAN(object):
     def __init__(self,args):
 
-        utils.cuda_devices([args.gpu_id])
+        utils.cuda_devices(args.gpu_ids)
 
         # Define the network 
-        self.Da = Discriminator()
-        self.Db = Discriminator()
-        self.Gab = Generator()
-        self.Gba = Generator()
+        self.Gab = define_Gen(input_nc=3, output_nc=3, ngf=args.ngf, netG='resnet_9blocks', norm=args.norm, 
+                                                    use_dropout= not args.no_dropout, gpu_ids=args.gpu_ids)
+        self.Gba = define_Gen(input_nc=3, output_nc=3, ngf=args.ngf, netG='resnet_9blocks', norm=args.norm, 
+                                                    use_dropout= not args.no_dropout, gpu_ids=args.gpu_ids)
+        self.Da = define_Dis(input_nc=3, ndf=args.ndf, netD= 'n_layers', n_layers_D=3, norm=args.norm, 
+                                                    use_sigmoid=args.use_sigmoid, gpu_ids=args.gpu_ids)
+        self.Db = define_Dis(input_nc=3, ndf=args.ndf, netD= 'n_layers', n_layers_D=3, norm=args.norm, 
+                                                    use_sigmoid=args.use_sigmoid, gpu_ids=args.gpu_ids)
 
         self.MSE = nn.MSELoss()
         self.L1 = nn.L1Loss()
@@ -103,6 +66,7 @@ class cycleGAN(object):
         transform = transforms.Compose(
             [transforms.RandomHorizontalFlip(),
              transforms.Resize((args.img_height,args.img_width)),
+             transforms.RandomCrop((args.crop_height,args.crop_width)),
              transforms.ToTensor(),
              transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])])
 
@@ -110,9 +74,9 @@ class cycleGAN(object):
 
         # Pytorch dataloader
         a_loader = torch.utils.data.DataLoader(dsets.ImageFolder(dataset_dirs['trainA'], transform=transform), 
-                                                                    batch_size=args.batch_size, shuffle=True, num_workers=4)
+                                                        batch_size=args.batch_size, shuffle=True, num_workers=4)
         b_loader = torch.utils.data.DataLoader(dsets.ImageFolder(dataset_dirs['trainB'], transform=transform), 
-                                                                    batch_size=args.batch_size, shuffle=True, num_workers=4)
+                                                        batch_size=args.batch_size, shuffle=True, num_workers=4)
 
         a_fake_sample = utils.Sample_from_Pool()
         b_fake_sample = utils.Sample_from_Pool()
