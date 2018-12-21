@@ -20,6 +20,13 @@ $ python main.py --training True
 ```
 $ python main.py --testing True
 ```
+* Try tweaking the arguments to get best performance according to the dataset.
 
 ## Results
-Coming Soon
+
+* For horse to zebra dataset.
+
+<p float="left">
+  <img src="https://github.com/arnab39/cycleGAN-PyTorch/blob/master/images/horse.png" width="320" />
+  <img src="https://github.com/arnab39/cycleGAN-PyTorch/blob/master/images/zebra.png" width="320" /> 
+</p>
