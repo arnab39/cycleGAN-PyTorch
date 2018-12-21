@@ -20,6 +20,7 @@ $ python main.py --training True
 ```
 $ python main.py --testing True
 ```
+* Try tweaking the arguments to get best performance according to the dataset.
 
 ## Results
 
