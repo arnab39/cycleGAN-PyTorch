@@ -22,4 +22,10 @@ $ python main.py --testing True
 ```
 
 ## Results
-Coming Soon
+
+* For horse to zebra dataset.
+
+<p float="left">
+  <img src="https://github.com/arnab39/cycleGAN-PyTorch/images/horse.jpg" width="420" />
+  <img src="https://github.com/arnab39/cycleGAN-PyTorch/images/zebra.jpg" width="420" /> 
+</p>
