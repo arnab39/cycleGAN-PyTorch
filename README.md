@@ -24,9 +24,16 @@ $ python main.py --testing True
 
 ## Results
 
-* For horse to zebra dataset.
+* For horse to zebra dataset. ( Real - Generated - Reconstructed)
 
 <p float="left">
-  <img src="https://github.com/arnab39/cycleGAN-PyTorch/blob/master/images/horse.png" width="320" />
-  <img src="https://github.com/arnab39/cycleGAN-PyTorch/blob/master/images/zebra.png" width="320" /> 
+  <img src="https://github.com/arnab39/cycleGAN-PyTorch/blob/master/images/horse_real.png" width="250" />
+  <img src="https://github.com/arnab39/cycleGAN-PyTorch/blob/master/images/zebra_generated.png" width="250" />
+  <img src="https://github.com/arnab39/cycleGAN-PyTorch/blob/master/images/horse_reconstructed.png" width="250" />
+</p>
+
+<p float="left">
+  <img src="https://github.com/arnab39/cycleGAN-PyTorch/blob/master/images/zebra_real.png" width="250" />
+  <img src="https://github.com/arnab39/cycleGAN-PyTorch/blob/master/images/horse_generated.png" width="250" />
+  <img src="https://github.com/arnab39/cycleGAN-PyTorch/blob/master/images/zebra_reconstructed.png" width="250" />
 </p>
