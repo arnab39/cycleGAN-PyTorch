@@ -6,7 +6,7 @@ import functools
 
 
 class NLayerDiscriminator(nn.Module):
-    def __init__(self, input_nc, ndf=64, n_layers=3, norm_layer=nn.BatchNorm2d, use_bias=False, use_sigmoid=False):
+    def __init__(self, input_nc, ndf=64, n_layers=3, norm_layer=nn.BatchNorm2d, use_bias=False):
         super(NLayerDiscriminator, self).__init__()
         dis_model = [nn.Conv2d(input_nc, ndf, kernel_size=4, stride=2, padding=1),
                      nn.LeakyReLU(0.2, True)]
@@ -22,8 +22,6 @@ class NLayerDiscriminator(nn.Module):
         dis_model += [conv_norm_lrelu(ndf * nf_mult_prev, ndf * nf_mult, kernel_size=4, stride=1,
                                                norm_layer= norm_layer, padding=1, bias=use_bias)]
         dis_model += [nn.Conv2d(ndf * nf_mult, 1, kernel_size=4, stride=1, padding=1)]
-        if use_sigmoid:
-            dis_model += [nn.Sigmoid()]
 
         self.dis_model = nn.Sequential(*dis_model)
 
@@ -31,7 +29,7 @@ class NLayerDiscriminator(nn.Module):
         return self.dis_model(input)
 
 class PixelDiscriminator(nn.Module):
-    def __init__(self, input_nc, ndf=64, norm_layer=nn.BatchNorm2d, use_bias=False, use_sigmoid=False):
+    def __init__(self, input_nc, ndf=64, norm_layer=nn.BatchNorm2d, use_bias=False):
         super(PixelDiscriminator, self).__init__()
         dis_model = [
             nn.Conv2d(input_nc, ndf, kernel_size=1, stride=1, padding=0),
@@ -41,9 +39,6 @@ class PixelDiscriminator(nn.Module):
             nn.LeakyReLU(0.2, True),
             nn.Conv2d(ndf * 2, 1, kernel_size=1, stride=1, padding=0, bias=use_bias)]
 
-        if use_sigmoid:
-            dis_model.append(nn.Sigmoid())
-
         self.dis_model = nn.Sequential(*dis_model)
 
     def forward(self, input):
@@ -51,7 +46,7 @@ class PixelDiscriminator(nn.Module):
 
 
 
-def define_Dis(input_nc, ndf, netD, n_layers_D=3, norm='batch', use_sigmoid=False, gpu_ids=[0]):
+def define_Dis(input_nc, ndf, netD, n_layers_D=3, norm='batch', gpu_ids=[0]):
     dis_net = None
     norm_layer = get_norm_layer(norm_type=norm)
     if type(norm_layer) == functools.partial:
@@ -60,11 +55,9 @@ def define_Dis(input_nc, ndf, netD, n_layers_D=3, norm='batch', use_sigmoid=Fals
         use_bias = norm_layer == nn.InstanceNorm2d
 
     if netD == 'n_layers':
-        dis_net = NLayerDiscriminator(input_nc, ndf, n_layers_D, norm_layer=norm_layer, 
-                                       use_bias=use_bias, use_sigmoid=use_sigmoid)
+        dis_net = NLayerDiscriminator(input_nc, ndf, n_layers_D, norm_layer=norm_layer, use_bias=use_bias)
     elif netD == 'pixel':
-        dis_net = PixelDiscriminator(input_nc, ndf, norm_layer=norm_layer, use_bias=use_bias,
-                                                           use_sigmoid=use_sigmoid)
+        dis_net = PixelDiscriminator(input_nc, ndf, norm_layer=norm_layer, use_bias=use_bias)
     else:
         raise NotImplementedError('Discriminator model name [%s] is not recognized' % netD)
 
