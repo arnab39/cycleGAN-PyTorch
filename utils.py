@@ -11,11 +11,6 @@ def mkdir(paths):
         if not os.path.isdir(path):
             os.makedirs(path)
 
-# To select GPU 
-def cuda_devices(gpu_ids):
-    gpu_ids = [str(i) for i in gpu_ids]
-    os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(gpu_ids)
-
 # To make cuda tensor
 def cuda(xs):
     if torch.cuda.is_available():
@@ -92,3 +87,23 @@ class Sample_from_Pool(object):
                 else:
                     return_items.append(in_item)
         return return_items
+
+class LambdaLR():
+    def __init__(self, epochs, offset, decay_epoch):
+        self.epochs = epochs
+        self.offset = offset
+        self.decay_epoch = decay_epoch
+
+    def step(self, epoch):
+        return 1.0 - max(0, epoch + self.offset - self.decay_epoch)/(self.epochs - self.decay_epoch)
+
+def print_networks(nets, names):
+    print('------------Number of Parameters---------------')
+    i=0
+    for net in nets:
+        num_params = 0
+        for param in net.parameters():
+            num_params += param.numel()
+        print('[Network %s] Total number of parameters : %.3f M' % (names[i], num_params / 1e6))
+        i=i+1
+    print('-----------------------------------------------')

@@ -13,9 +13,9 @@ from arch import define_Gen, define_Dis
 
 
 def test(args):
-    utils.cuda_devices([args.gpu_id])
+
     transform = transforms.Compose(
-        [transforms.Resize((args.img_height,args.img_width)),
+        [transforms.Resize((args.crop_height,args.crop_width)),
          transforms.ToTensor(),
          transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])])
 
@@ -28,13 +28,12 @@ def test(args):
     a_test_loader = torch.utils.data.DataLoader(a_test_data, batch_size=args.batch_size, shuffle=True, num_workers=4)
     b_test_loader = torch.utils.data.DataLoader(b_test_data, batch_size=args.batch_size, shuffle=True, num_workers=4)
 
-    self.Gab = define_Gen(input_nc=3, output_nc=3, ngf=args.ngf, netG='resnet_9blocks', norm=args.norm, 
+    Gab = define_Gen(input_nc=3, output_nc=3, ngf=args.ngf, netG='resnet_9blocks', norm=args.norm, 
                                                     use_dropout= not args.no_dropout, gpu_ids=args.gpu_ids)
-    self.Gba = define_Gen(input_nc=3, output_nc=3, ngf=args.ngf, netG='resnet_9blocks', norm=args.norm, 
+    Gba = define_Gen(input_nc=3, output_nc=3, ngf=args.ngf, netG='resnet_9blocks', norm=args.norm, 
                                                     use_dropout= not args.no_dropout, gpu_ids=args.gpu_ids)
 
-    utils.cuda([Gab, Gba])
-
+    utils.print_networks([Gab,Gba], ['Gab','Gba'])
 
     try:
         ckpt = utils.load_checkpoint('%s/latest.ckpt' % (args.checkpoint_dir))
